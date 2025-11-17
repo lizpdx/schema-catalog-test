@@ -1,0 +1,37 @@
+
+name: Schema Change Detector
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'models/**'
+
+jobs:
+  check-schemas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Detect schema changes
+        run: |
+          python3 scripts/detect_changes.py
+      
+      - name: Comment on PR
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Breaking schema changes detected! Please review carefully.'
+            })
