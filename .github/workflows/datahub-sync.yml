@@ -1,0 +1,42 @@
+
+name: Sync to DataHub
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'models/**'
+
+jobs:
+  sync-datahub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install DataHub CLI
+        run: |
+          pip install 'acryl-datahub[datahub-rest]'
+      
+      - name: Generate metadata
+        run: |
+          python3 scripts/generate_metadata.py
+      
+      - name: Ingest to DataHub
+        env:
+          DATAHUB_GMS_URL: ${{ secrets.DATAHUB_GMS_URL }}
+        run: |
+          # Update datahub_ingestion.yml with production URL
+          # datahub ingest -c datahub_ingestion.yml
+          echo "Would ingest to production DataHub here"
+      
+      - name: Upload metadata artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: datahub-metadata
+          path: metadata/
+          retention-days: 30

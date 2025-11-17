@@ -1,7 +1,6 @@
+
 class User:
-    """User model v2 - BREAKING CHANGE"""
+    """User model v3 - Another breaking change"""
     id: int
     email: str
-    first_name: str  # NEW
-    last_name: str   # NEW
-    # Removed: name
+    # Removed: first_name, last_name
